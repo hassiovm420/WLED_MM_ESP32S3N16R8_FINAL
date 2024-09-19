@@ -45,7 +45,7 @@ jobs:
         cd $(cat /tmp/WLEDtemp/v0.14.1-beta.32)
         echo '[env:custom_build]' >> platformio.ini
         echo 'extends = env:esp32s3dev_16MB_PSRAM_opi' >> platformio.ini
-        echo 'build_flags = ${env:esp32s3dev_16MB_PSRAM_opi.build_flags} -D SR_DEBUG -D MIC_LOGGER -D WLED_ENABLE_PIXART -D CLIENT_SSID='\''"Wer hackt ist gay"'\'' -D CLIENT_PASS='\''"HaRePa18a#*%"'\''' >> platformio.ini
+        echo 'build_flags = ${env:esp32s3dev_16MB_PSRAM_opi.build_flags} >> platformio.ini
         echo 'build_unflags = -D WLED_RELEASE_NAME' >> platformio.ini
         pio run -e custom_build || pio run -e custom_build
 
