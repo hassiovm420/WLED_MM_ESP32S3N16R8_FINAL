@@ -32,8 +32,8 @@ jobs:
         mkdir -p /tmp/WLEDtemp
         wget https://api.github.com/repos/MoonModules/WLED/zipball/v0.14.1-beta.32 -O /tmp/WLEDtemp/mm.zip
         unzip /tmp/WLEDtemp/mm.zip -d /tmp/WLEDtemp
-        find /tmp/WLEDtemp -maxdepth 1 -mindepth 1 -name "*" -type d > /tmp/WLEDtemp/wledfoldername
-        cd $(cat /tmp/WLEDtemp/wledfoldername)
+        find /tmp/WLEDtemp -maxdepth 1 -mindepth 1 -name "*" -type d > /tmp/WLEDtemp/v0.14.1-beta.32
+        cd $(cat /tmp/WLEDtemp/v0.14.1-beta.32)
 
     - name: Install Node.js dependencies
       run: |
