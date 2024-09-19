@@ -1,4 +1,4 @@
-name: Kompilieren
+name: Kompilieren2
 
 on:
   workflow_dispatch:
@@ -53,8 +53,8 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         git rm -r $GITHUB_WORKSPACE/*.bin || true
-        WLEDFOLDERNAME=$(cat /tmp/WLEDtemp/wledfoldername)
-        cp ${WLEDFOLDERNAME}/.pio/build/custom_build/firmware.bin $GITHUB_WORKSPACE/
+        v0.14.1-beta.32=$(cat /tmp/WLEDtemp/v0.14.1-beta.32)
+        cp ${v0.14.1-beta.32}/.pio/build/custom_build/firmware.bin $GITHUB_WORKSPACE/
 
     - name: Add Timestamp and Commit Files
       run: |
