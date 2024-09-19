@@ -1,0 +1,68 @@
+name: Kompilieren
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16'
+
+    - name: Download and Extract WLED
+      run: |
+        rm -rf /tmp/WLEDtemp/* || true
+        mkdir -p /tmp/WLEDtemp
+        wget https://api.github.com/repos/MoonModules/WLED/zipball/v0.14.1-beta.32 -O /tmp/WLEDtemp/mm.zip
+        unzip /tmp/WLEDtemp/mm.zip -d /tmp/WLEDtemp
+        find /tmp/WLEDtemp -maxdepth 1 -mindepth 1 -name "*" -type d > /tmp/WLEDtemp/wledfoldername
+        cd $(cat /tmp/WLEDtemp/wledfoldername)
+
+    - name: Install Node.js dependencies
+      run: |
+        cd $(cat /tmp/WLEDtemp/wledfoldername)
+        npm install
+
+    - name: Modify platformio.ini and Build
+      run: |
+        cd $(cat /tmp/WLEDtemp/wledfoldername)
+        echo '[env:custom_build]' >> platformio.ini
+        echo 'extends = env:esp32s3dev_16MB_PSRAM_opi' >> platformio.ini
+        echo 'build_flags = ${env:esp32s3dev_16MB_PSRAM_opi.build_flags} -D SR_DEBUG -D MIC_LOGGER -D WLED_ENABLE_PIXART -D CLIENT_SSID='\''"Wer hackt ist gay"'\'' -D CLIENT_PASS='\''"HaRePa18a#*%"'\''' >> platformio.ini
+        echo 'build_unflags = -D WLED_RELEASE_NAME' >> platformio.ini
+        pio run -e custom_build || pio run -e custom_build
+
+    - name: Copy Binary to Workspace
+      run: |
+        cd $GITHUB_WORKSPACE
+        git rm -r $GITHUB_WORKSPACE/*.bin || true
+        WLEDFOLDERNAME=$(cat /tmp/WLEDtemp/wledfoldername)
+        cp ${WLEDFOLDERNAME}/.pio/build/custom_build/firmware.bin $GITHUB_WORKSPACE/
+
+    - name: Add Timestamp and Commit Files
+      run: |
+        cd $GITHUB_WORKSPACE
+        date -I | tr -d '\n' > $GITHUB_WORKSPACE/last_update_date.txt
+        git config user.name "GitHub Actions Bot"
+        git config user.email "bot@example.com"
+        git add $GITHUB_WORKSPACE/custom_build.bin
+        git add $GITHUB_WORKSPACE/last_update_date.txt
+        git commit -m "Commit Custom Build"
+        git push origin main
